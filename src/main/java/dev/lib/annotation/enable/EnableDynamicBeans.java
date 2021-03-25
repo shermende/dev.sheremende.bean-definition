@@ -1,6 +1,6 @@
 package dev.lib.annotation.enable;
 
-import dev.lib.registar.DynamicBeanImportBeanDefinitionRegistrar;
+import dev.lib.registrar.DynamicBeanImportBeanDefinitionRegistrar;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

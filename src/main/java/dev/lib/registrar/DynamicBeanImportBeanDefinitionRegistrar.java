@@ -1,4 +1,4 @@
-package dev.lib.registar;
+package dev.lib.registrar;
 
 import dev.lib.annotation.DynamicBean;
 import dev.lib.annotation.enable.EnableDynamicBeans;
@@ -62,7 +62,7 @@ public class DynamicBeanImportBeanDefinitionRegistrar implements ImportBeanDefin
         getBeanCandidates(metadata).stream()
                 .filter(candidate -> (candidate instanceof AnnotatedBeanDefinition))
                 .map(AnnotatedBeanDefinition.class::cast)
-                .forEach(beanDefinition -> registerFeignClient(registry, beanDefinition));
+                .forEach(beanDefinition -> registerDynamicBean(registry, beanDefinition));
     }
 
     private LinkedHashSet<BeanDefinition> getBeanCandidates(
@@ -108,7 +108,7 @@ public class DynamicBeanImportBeanDefinitionRegistrar implements ImportBeanDefin
         return packages;
     }
 
-    private void registerFeignClient(
+    private void registerDynamicBean(
             BeanDefinitionRegistry registry,
             AnnotatedBeanDefinition annotatedBeanDefinition
     ) {
@@ -116,14 +116,6 @@ public class DynamicBeanImportBeanDefinitionRegistrar implements ImportBeanDefin
         final Map<String, Object> attributes = Objects.requireNonNull(annotationMetadata.getAnnotationAttributes(DynamicBean.class.getCanonicalName()));
 
         // register amqp-producer bean definition
-        registerAmqpProducer(registry, annotationMetadata, attributes);
-    }
-
-    private void registerAmqpProducer(
-            BeanDefinitionRegistry registry,
-            AnnotationMetadata annotationMetadata,
-            Map<String, Object> attributes
-    ) {
         // bean-definition-builder
         final BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DynamicBeanFactoryBean.class);
         beanDefinitionBuilder.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
@@ -141,6 +133,5 @@ public class DynamicBeanImportBeanDefinitionRegistrar implements ImportBeanDefin
                         registry
                 );
     }
-
 
 }

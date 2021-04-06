@@ -5,5 +5,5 @@ import dev.shermende.beanfromannotation.handler.SecondServiceHandler;
 
 @DynamicBean(value = "secondService", handler = SecondServiceHandler.class)
 public interface SecondService {
-    void second(Long hello);
+    int second(Long hello);
 }

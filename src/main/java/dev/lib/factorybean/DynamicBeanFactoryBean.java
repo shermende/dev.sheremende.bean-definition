@@ -33,8 +33,9 @@ public class DynamicBeanFactoryBean implements FactoryBean<Object> {
                 Thread.currentThread().getContextClassLoader(),
                 new Class[]{type},
                 (proxy, method, args) -> {
-                    log.info("Proxying: {} {}", method.getName(), args);
-                    return handler.invoke(proxy, method, args);
+                    final Object invoke = handler.invoke(proxy, method, args);
+                    log.info("Proxying: {} {} {}", invoke, method.getName(), args);
+                    return invoke;
                 }
         );
     }

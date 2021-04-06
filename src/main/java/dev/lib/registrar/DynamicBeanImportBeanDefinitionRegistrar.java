@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 @Component
 public class DynamicBeanImportBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar, BeanFactoryAware, ResourceLoaderAware, EnvironmentAware {
@@ -53,7 +54,6 @@ public class DynamicBeanImportBeanDefinitionRegistrar implements ImportBeanDefin
         this.resourceLoader = resourceLoader;
     }
 
-
     @Override
     public void registerBeanDefinitions(
             AnnotationMetadata metadata,
@@ -68,8 +68,8 @@ public class DynamicBeanImportBeanDefinitionRegistrar implements ImportBeanDefin
     private LinkedHashSet<BeanDefinition> getBeanCandidates(
             AnnotationMetadata metadata
     ) {
-        final ClassPathScanningCandidateComponentProvider scanner = getClassPathScanningCandidateComponentProvider();
         final LinkedHashSet<BeanDefinition> candidates = new LinkedHashSet<>();
+        final ClassPathScanningCandidateComponentProvider scanner = getClassPathScanningCandidateComponentProvider();
         for (String packages : getBasePackages(metadata)) candidates.addAll(scanner.findCandidateComponents(packages));
         return candidates;
     }
@@ -96,13 +96,13 @@ public class DynamicBeanImportBeanDefinitionRegistrar implements ImportBeanDefin
             AnnotationMetadata metadata
     ) {
         final Set<String> packages = new HashSet<>();
-
         final Map<String, Object> attributes = metadata.getAnnotationAttributes(EnableDynamicBeans.class.getCanonicalName());
 
-        Optional.ofNullable(attributes).map(var -> var.get("basePackageClasses")).map(Class[].class::cast)
-                .ifPresent(classes -> {
-                    for (Class<?> clazz : classes) packages.add(ClassUtils.getPackageName(clazz));
-                });
+        Optional.ofNullable(attributes).map(var -> var.get("basePackageClasses"))
+                .map(Class[].class::cast)
+                .map(Stream::of)
+                .orElseGet(Stream::empty)
+                .forEach(clazz -> packages.add(ClassUtils.getPackageName(clazz)));
 
         if (packages.isEmpty()) packages.add(ClassUtils.getPackageName(metadata.getClassName()));
         return packages;
